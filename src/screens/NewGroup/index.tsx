@@ -1,16 +1,20 @@
-import { Container, Content, Icon } from "./styles";
+import { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 
 import { Button } from "@/components/Button";
 import { Header } from "@/components/Header";
 import { Highlight } from "@/components/Highlight";
 import { Input } from "@/components/Input";
-import { useState } from "react";
+
+import { Container, Content, Icon } from "./styles";
 
 export function NewGroup() {
   const [groupName, setGroupName] = useState('')
 
+  const navigation = useNavigation()
+
   function handleNewGroup() {
-    console.log(groupName);
+    navigation.navigate('players', { group: 'Rocket' })
   }
   
   return (
