@@ -25,8 +25,8 @@ export function NewGroup() {
     }
 
     try {
-      await groupCreate(groupName)
-      navigation.navigate('players', { group: groupName })
+      await groupCreate(newGroup)
+      navigation.navigate('players', { group: newGroup })
       
     } catch (error) {
       if(error instanceof AppError) {
