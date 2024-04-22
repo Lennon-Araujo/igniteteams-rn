@@ -64,7 +64,6 @@ export function Players(){
   }
 
   async function handleRemovePlayer(player: PlayerStorageDTO){
-    Alert.prompt('Remover Jogador', 'Você deseja remover o jogador?',)
     await removePlayer(player, group)
     await fetchPlayersByTeam()
   }
@@ -117,7 +116,16 @@ export function Players(){
         renderItem={({ item }) => (
           <PlayerCard
             name={item.name}
-            onRemove={() => handleRemovePlayer(item)}
+            onRemove={() => (
+              Alert.alert(
+                'Remover Jogador',
+                'Você deseja remover o jogador?',
+                [
+                  {text: 'Cancelar'},
+                  {text: 'Confirmar', onPress: () => handleRemovePlayer(item)}
+                ]
+              )
+            )}
           />
         )}
         ListEmptyComponent={() => (
