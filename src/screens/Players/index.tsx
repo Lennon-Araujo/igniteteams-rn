@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Alert, FlatList, TextInput } from "react-native";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { Header } from "@/components/Header";
 import { Highlight } from "@/components/Highlight";
@@ -18,6 +18,7 @@ import { AppError } from "@/utils/AppError";
 import { PlayerStorageDTO } from "@/storage/player/PlayerStorageDTO";
 import { removePlayer } from "@/storage/player/removePlayer";
 import { fetchPlayersByGroupAndTeam } from "@/storage/player/fetchPlayersByGroupAndTeam";
+import { groupRemove } from "@/storage/group/groupRemove";
 
 type RouteParams = {
   group: string;
@@ -28,6 +29,7 @@ export function Players(){
   const [team, setTeam] = useState('Time A')
   const [players, setPlayers] = useState<PlayerStorageDTO[]>([])
 
+  const navigation = useNavigation();
   const route = useRoute()
   const { group } = route.params as RouteParams
 
@@ -72,6 +74,16 @@ export function Players(){
     } catch (error) {
       console.log(error);
       Alert.alert('Remover jogador', 'Não foi possível remover o jogador.')
+    }
+  }
+
+  async function handleRemoveGroup() {
+    try {
+      await groupRemove(group)
+      navigation.navigate('groups')
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Remover Turma', 'Não foi possível remover a turma.')
     }
   }
 
@@ -154,6 +166,16 @@ export function Players(){
         title="Remover Turma"
         type='SECONDARY'
         style={{marginTop: 6}}
+        onPress={() => (
+          Alert.alert(
+            'Remover Turma',
+            'Tem certeza que deseja remover a turma?',
+            [
+              {text: 'Cancelar'},
+              {text: 'Confirmar', onPress: () => handleRemoveGroup()}
+            ]
+          )
+        )}
       />
 
     </Container>
