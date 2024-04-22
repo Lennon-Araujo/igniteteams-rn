@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, FlatList } from "react-native";
 import { useRoute } from "@react-navigation/native";
 
@@ -15,7 +15,9 @@ import { PlayerCard } from "@/components/PlayerCard";
 import { Container, Form, HeaderList, NumberOfPlayers } from "./styles";
 import { addPlayerByGroup } from "@/storage/player/addPlayerByGroup";
 import { AppError } from "@/utils/AppError";
-import { fetchPlayersByGroup } from "@/storage/player/fetchPlayersByGroup";
+import { PlayerStorageDTO } from "@/storage/player/PlayerStorageDTO";
+import { removePlayer } from "@/storage/player/removePlayer";
+import { fetchPlayersByGroupAndTeam } from "@/storage/player/fetchPlayersByGroupAndTeam";
 
 type RouteParams = {
   group: string;
@@ -24,10 +26,19 @@ type RouteParams = {
 export function Players(){
   const [newPlayerName, setNewPlayerName] = useState('')
   const [team, setTeam] = useState('Time A')
-  const [players, setPlayers] = useState(['Player 1', 'Player 2', 'Player 3'])
+  const [players, setPlayers] = useState<PlayerStorageDTO[]>([])
 
   const route = useRoute()
   const { group } = route.params as RouteParams
+
+  async function fetchPlayersByTeam() {
+    try {
+      const playersOnTeam = await fetchPlayersByGroupAndTeam(team, group)
+      setPlayers(playersOnTeam)
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   async function handleAddPlayer() {
     if(newPlayerName.trim() === '') {
@@ -37,8 +48,9 @@ export function Players(){
     const newPlayer = { name: newPlayerName.trim(), team: team.trim() }
 
     try {
-      const players = await fetchPlayersByGroup(group)
       await addPlayerByGroup( newPlayer, group )
+      await fetchPlayersByTeam()
+      setNewPlayerName('')
       
     } catch (error) {
       if(error instanceof AppError) {
@@ -50,6 +62,16 @@ export function Players(){
       }
     }
   }
+
+  async function handleRemovePlayer(player: PlayerStorageDTO){
+    Alert.prompt('Remover Jogador', 'Você deseja remover o jogador?',)
+    await removePlayer(player, group)
+    await fetchPlayersByTeam()
+  }
+
+  useEffect(() => {
+    fetchPlayersByTeam()
+  }, [team]);
 
   return (
     <Container>
@@ -91,11 +113,11 @@ export function Players(){
 
       <FlatList
         data={players}
-        keyExtractor={item => item}
+        keyExtractor={(item) => item.name}
         renderItem={({ item }) => (
           <PlayerCard
-            name={item}
-            onRemove={() => {}}
+            name={item.name}
+            onRemove={() => handleRemovePlayer(item)}
           />
         )}
         ListEmptyComponent={() => (
@@ -113,6 +135,7 @@ export function Players(){
       <Button
         title="Remover Turma"
         type='SECONDARY'
+        style={{marginTop: 6}}
       />
 
     </Container>
