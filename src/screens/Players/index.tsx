@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Alert, FlatList } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Alert, FlatList, TextInput } from "react-native";
 import { useRoute } from "@react-navigation/native";
 
 import { Header } from "@/components/Header";
@@ -30,6 +30,8 @@ export function Players(){
 
   const route = useRoute()
   const { group } = route.params as RouteParams
+
+  const newPlayerNameInputRef = useRef<TextInput>(null)
 
   async function fetchPlayersByTeam() {
     try {
@@ -64,8 +66,13 @@ export function Players(){
   }
 
   async function handleRemovePlayer(player: PlayerStorageDTO){
-    await removePlayer(player, group)
-    await fetchPlayersByTeam()
+    try {
+      await removePlayer(player, group)
+      await fetchPlayersByTeam()
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Remover jogador', 'Não foi possível remover o jogador.')
+    }
   }
 
   useEffect(() => {
@@ -83,10 +90,13 @@ export function Players(){
 
       <Form>
         <Input
+          inputRef={newPlayerNameInputRef}
           value={newPlayerName}
           onChangeText={setNewPlayerName}
           placeholder="Nome da pessoa"
           autoCorrect={false}
+          onSubmitEditing={handleAddPlayer}
+          returnKeyType="done"
         />
         <ButtonIcon onPress={handleAddPlayer} icon="add" />
       </Form>
