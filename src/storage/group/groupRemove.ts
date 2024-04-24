@@ -9,10 +9,10 @@ export async function groupRemove(groupForRemove: string) {
 
     const storageUpdated = storedGroups.filter(group => group !== groupForRemove)
 
-    const storage = JSON.stringify([...storageUpdated])
+    const storage = JSON.stringify(storageUpdated)
 
-    await AsyncStorage.removeItem(PLAYER_COLLECTION)
     await AsyncStorage.setItem(GROUP_COLLECTION, storage)
+    await AsyncStorage.removeItem(`${PLAYER_COLLECTION}-${groupForRemove}`)
   } catch (error) {
     throw error;
   }

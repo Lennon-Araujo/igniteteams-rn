@@ -77,7 +77,7 @@ export function Players(){
     }
   }
 
-  async function handleRemoveGroup() {
+  async function onRemoveGroup() {
     try {
       await groupRemove(group)
       navigation.navigate('groups')
@@ -85,6 +85,17 @@ export function Players(){
       console.log(error);
       Alert.alert('Remover Turma', 'Não foi possível remover a turma.')
     }
+  }
+  
+  function handleRemoveGroup() {
+    Alert.alert(
+      'Remover Turma',
+      'Tem certeza que deseja remover a turma?',
+      [
+        {text: 'Cancelar', style: 'cancel'},
+        {text: 'Confirmar', onPress: () => onRemoveGroup()}
+      ]
+    )
   }
 
   useEffect(() => {
@@ -166,16 +177,7 @@ export function Players(){
         title="Remover Turma"
         type='SECONDARY'
         style={{marginTop: 6}}
-        onPress={() => (
-          Alert.alert(
-            'Remover Turma',
-            'Tem certeza que deseja remover a turma?',
-            [
-              {text: 'Cancelar'},
-              {text: 'Confirmar', onPress: () => handleRemoveGroup()}
-            ]
-          )
-        )}
+        onPress={handleRemoveGroup}
       />
 
     </Container>
